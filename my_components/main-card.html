@@ -1,0 +1,215 @@
+<link rel="import" href="../bower_components/core-collapse/core-collapse.html">
+<link rel="import" href="../bower_components/core-selector/core-selector.html">
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
+<link rel="import" href="list-card.html">
+<link rel="import" href="list-nav.html">
+
+<polymer-element name="main-card" attributes="groups isDirect route" center-justified horizontal layout>
+<template>
+	<style>
+		:host {
+			width: 970px;
+			margin: 0 auto;
+		}
+
+		button:focus {
+			outline: none;
+		}
+
+		.main-panel {		
+			width: 100%;							
+		}
+
+		.resources-panel {
+			width: 100%;
+			margin-top: 60px;
+		}
+
+		#btn_resources {
+			width: 100%;
+			height: 60px;
+			color: rgba(102,102,102,1);
+			font-size: 20px;
+
+			background: rgba(255,255,255,1);			
+			border: 1px solid rgba(220,220,220,1);			
+			cursor: pointer;
+			padding-left: 20px;
+		}		
+
+		#btn_resources:hover {
+			color: rgba(140,185,10,1);
+			border-color: rgba(205,205,205,1);
+		}
+
+		#btn_resources.opened {
+			background: rgba(165,205,10,1);
+			border-color: rgba(165,205,10,1);
+			color: rgba(255,255,255,1);
+		}		
+
+		.collapse-content {
+			width: 100%;
+			margin-top: 28px;
+		}
+
+		.collapse-content button {
+			width: 416px;
+			height: 64px;
+			cursor: pointer;			
+			margin-right: 18px;
+			margin-left: 18px;
+			margin-bottom: 18px;
+			padding-left: 25px;
+
+			font-size: 15px;
+			color: rgba(120,120,120,1);
+			background: rgba(255,255,255,1);			
+			border: 1px solid rgba(220,220,220,1);
+		}		
+
+		.collapse-content button:hover {
+			border-color: rgba(205,205,205,1);
+			color: rgba(110,140,0,1);
+		}		
+
+		.collapse-content a {
+			text-decoration: none;
+		}
+
+		.item-list {	
+			position: absolute;				
+			left: 0;
+			right: 0;
+			top: 20px;	
+			width: 100%;								
+		}		
+
+		.card {	
+			position: relative;
+			float: left;
+			width: 300px;			
+			height: 430px;			
+			margin-bottom: 40px;						
+			background: rgb(255,255,255);			
+			text-align: left;
+
+			border: 1px solid rgba(220,220,220,1);
+			border-radius: 5px;
+			box-shadow: 0px 3px 0px 0px rgba(220,220,220,1);
+		}
+
+		.card:hover {
+			border-color: rgba(205,205,205,1);
+			box-shadow: 0px 3px 0px 0px rgba(205,205,205,1);
+		}
+
+		.card core-image {
+			width:240px; 
+			height:160px; 
+			margin: 0 auto; 
+			margin-top: 34px;
+			margin-bottom: 38px;
+		}
+
+		.card .group_title {			
+			font-size: 20px;
+			color: rgba(102,102,102,1);
+			margin-left: 30px;
+			margin-bottom: 29px;
+		}		
+
+		.card .group_title.gi_1 {
+			color: rgba(115,150,0,1);
+		}
+
+		.card list-card {
+			margin-left: 30px;
+		}
+
+	</style>
+	<div class="main-panel" center-justified vertical layout>				
+		<div class="resources-panel" hidden?={{selected?1:0}}>
+			<button id="btn_resources" on-click="{{toggleResources}}" horizontal layout><div>Resources</div> <span flex></span><core-icon id="ic_expand" icon="expand-more"></core-icon></button>
+			<core-collapse id="collapse">
+				<div class="collapse-content" horizontal layout center-justified wrap>
+					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource1</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource2</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource3</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource4</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+				</div>
+			</core-collapse>
+		</div>
+
+		<core-animated-pages selected="{{selected}}" transitions="hero-transition cross-fade">			
+			<section>
+				<div class="item-list" horizontal justified layout wrap>			
+					<template repeat="{{group, i in groups}}">											
+						<div class="card" hero-id="group-{{i}}" hero cross-fade vertical layout>
+							<core-image sizing="cover" src="../images/{{group.img}}"></core-image>
+							<div class="group_title gi_{{i}}">{{group.title}}</div>		
+							<list-card categories="{{group.categories}}" groupId="{{i}}" on-core-activate="{{onHandler}}"></list-card>					
+						</div>						
+					</template>					
+				</div>
+			</section>
+
+			<list-nav on-nav-back="{{changePage}}" group="{{group}}" groupId="{{group_id}}" categoryIdx="{{category_idx}}"></list-nav>
+		</core-animated-pages>
+	</div>
+</template>
+<script>
+	Polymer('main-card', {
+		selected: 0,
+		group_id: -1,		
+		category_idx: -1,		
+		isDirect: false,
+
+		created: function() {
+			this.groups = [];
+			this.group = [];
+		},
+		
+		domReady: function(e) {
+			if(this.route){
+		    	this.isDirect = true;			  			    				    	
+	    		var arrRoute = this.route.split("/");					    		
+	    		this.group_id = arrRoute[0];
+	    		this.group = this.groups[this.group_id];					
+				this.category_idx = arrRoute[1];
+				this.changePage();
+		    }
+		},	
+		
+		toggleResources: function() {
+			this.$.collapse.toggle();
+
+			if(this.$.collapse.opened) {
+				this.$.btn_resources.setAttribute("class", "opened");
+				this.$.ic_expand.setAttribute("icon", "expand-less");
+			} else {
+				this.$.btn_resources.setAttribute("class", "");
+				this.$.ic_expand.setAttribute("icon", "expand-more");
+			}				
+		},
+		
+		onHandler: function(event, detail, sender) {
+			this.group_id = detail.item.getAttribute("groupId");
+			this.group = this.groups[this.group_id];			
+
+			this.category_idx = detail.item.getAttribute("category-idx");
+			this.changePage();	
+		},
+
+		changePage: function() {			
+			this.fire('change-page', {selected: this.selected});
+			if(this.selected===0){
+				this.selected=1;				
+			} else {
+				this.selected=0;				
+			}			
+		}		
+	});
+</script>
+</polymer-element>

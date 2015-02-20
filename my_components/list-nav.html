@@ -1,0 +1,113 @@
+<link rel="import" href="../bower_components/core-menu/core-menu.html">	
+<link rel="import" href="../bower_components/core-menu/core-submenu.html">	
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
+<link rel="import" href="content-page.html">
+
+<polymer-element name="list-nav" attributes="selectedItem group groupId categoryIdx">
+<template>
+	<style>
+		:host {
+			width: 300px;			
+		}
+
+		.nav {
+			position: absolute;			
+			width: 100%; 			
+			height: 100%;
+			margin-top: 65px;
+			padding-left: 30px;
+			padding-right: 30px;
+		}
+
+		core-drawer-panel {			
+			overflow: inherit;
+			height: 1000px;
+		}
+
+		.group_title {
+			margin-top: 38px;
+			margin-left: 10px;
+			font-size: 22px;
+		}
+
+		core-item {
+			color: rgba(128,128,128,1);
+			cursor: pointer;			
+		}
+
+		core-item:hover {
+			color: rgba(110,137,0,1);
+			font-weight: bold;
+		}
+
+		core-item.core-selected {
+			font-weight: bold;			
+			color: rgba(140,185,0,1);
+		}
+
+		.cate {
+			font-size: 16px;			
+		}		
+	
+		.subcate {
+			font-size: 14px;			
+			margin-left: 22px;			
+		}
+
+	</style>	
+
+	<core-drawer-panel>
+		<div drawer>			
+			<section layout vertical id="navBar">
+				<div layout vertical>				
+					<core-icon-button icon="home" on-tap="{{back}}"></core-icon-button>		
+				</div>				
+				<div class="nav" hero-id="group-{{groupId}}" hero cross-fade>
+					<core-image style="width:240px; height:160px" sizing="cover" src="../images/{{group.img}}"></core-image>
+					<div class="group_title">{{group.title}}</div>
+					<core-menu selected="{{categoryIdx}}" on-core-select="{{selectAction}}">
+						<template repeat="{{cate, i in group.categories}}">
+							<core-item class="cate" style="cursor: pointer" label="{{cate.title}}" idx="{{i}}">
+								<a href="#{{groupId}}/{{i}}"></a>
+							</core-item>
+							<template if="{{cate.sub}}">
+								<template repeat="{{sub, j in cate.sub}}">
+									<core-item class="subcate" style="cursor: pointer" catetitle="{{cate.title}}" label="{{sub}}" idx="{{j}}"></core-item>	
+								</template>	
+							</template>							
+						</template>
+					</core-menu>
+				</div>
+			</section>	
+		</div>
+		<div main>
+			<content-page category="{{item}}" cross-fade></content-page>
+		</div>
+</template>
+<script>
+	Polymer({
+		selectedItem: null,
+		item: null,		
+
+		back: function() {			
+			this.fire('nav-back');
+		},
+
+		selectAction: function(e, detail) {
+			if(detail.isSelected) {											
+				var cate = this.group.categories[this.categoryIdx];
+				var content = "";
+				if(cate!=undefined && cate.content!=undefined) content = cate.content;
+
+				this.item = {
+					catetitle: detail.item.getAttribute("catetitle"), 
+					label: detail.item.label, 
+					idx: detail.item.getAttribute("idx"),
+					content: content
+				};												
+			}
+		}
+	});
+</script>
+</polymer-element>

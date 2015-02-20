@@ -1,0 +1,40 @@
+<link rel="import" href="../bower_components/core-selector/core-selector.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+
+<polymer-element name="list-card" attributes="categories groupId" vertical layout>
+<template>	
+	<style>		
+		core-item {
+			min-height: 30px;
+			font-size: 14px;
+			color: rgba(128,128,128,1);			
+			cursor: pointer;					
+		}
+
+		core-item.gi_1 {
+			color: rgba(140,185,0,1);
+		}		
+
+		core-item:hover {
+			color: rgba(110,137,0,1);
+			font-weight: bold;
+		}		
+
+	</style>
+	<core-selector>
+		<template repeat="{{cate, i in categories}}">									
+			<core-item class="gi_{{groupId}}" groupId="{{groupId}}" category-idx="{{i}}" label="{{cate.title}}">
+				<a href="#{{groupId}}/{{i}}"></a>
+			</core-item>
+		</template>														
+	</core-selector>		
+</template>
+<script>
+	Polymer('list-card', {		
+
+		created: function () {
+
+		}
+	});
+</script>
+</polymer-element>

@@ -1,0 +1,55 @@
+
+<polymer-element name="content-page" attributes="category" horizontal layout center>
+<template>
+	<style>
+		.wrapper {			
+			position: absolute;
+			width: 654px;
+			height: 100%;		
+			background: #fff;	
+			overflow: hidden;
+			margin-bottom: 100px;
+		}
+
+		.title {
+			margin-top: 100px;
+			font-size: 32px;
+			color: rgba(140,185,0,1);
+		}
+
+		.subtitle {
+			margin-top: 84px;
+			margin-bottom: 36px;
+			font-size: 22px;
+			color: rgba(102,102,102,1);
+		}
+
+	</style>
+	<div class="wrapper" flex vertical center layout>
+		<template if="{{category.catetitle}}">
+			<div class="title">{{category.catetitle}}</div>				
+			<div class="subtitle">{{category.label}}</div>
+		</template>
+		<template if="{{!category.catetitle}}">
+			<div class="title">{{category.label}}</div>
+		</template>
+		<template if="{{category.content}}">
+			<div class="content">
+				<div class="intro">{{category.content.intro}}</div>
+				<template repeat="{{par, i in category.content.pars}}">
+					<div class="subtitle">{{par.subtitle}}</div>
+					<core-image style="width:240px; height:160px" sizing="cover" src="../images/{{par.img}}"></core-image>
+					<div class="detail">{{par.detail}}</div>
+				</template>
+			</div>			
+		</template>
+	</div>		
+</template>
+<script>
+	Polymer('content-page', {
+		created: function() {
+			this.category = "";
+		}
+	});
+</script>
+</polymer-element>
