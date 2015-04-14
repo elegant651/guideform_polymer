@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/core-selector/core-selector.html">
 <link rel="import" href="../bower_components/core-item/core-item.html">
 
-<polymer-element name="list-card" attributes="categories groupId" vertical layout>
+<polymer-element name="list-card" attributes="mode categories groupId" vertical layout>
 <template>	
 	<style>		
 		core-item {
@@ -11,19 +11,19 @@
 			cursor: pointer;					
 		}
 
-		core-item.gi_1 {
-			color: rgba(140,185,0,1);
+		core-item.core-selected {
+			font-weight: normal;
 		}		
 
 		core-item:hover {
-			color: rgba(110,137,0,1);
+			color: rgba(140,185,0,1);
 			font-weight: bold;
 		}		
 
-	</style>
-	<core-selector>
+	</style>	
+	<core-selector>		
 		<template repeat="{{cate, i in categories}}">									
-			<core-item class="gi_{{groupId}}" groupId="{{groupId}}" category-idx="{{i}}" label="{{cate.title}}">
+			<core-item class="gi_{{groupId}}" groupId="{{groupId}}" category-idx="{{i}}" label="{{cate.title}}">				
 				<a href="#{{groupId}}/{{i}}"></a>
 			</core-item>
 		</template>														

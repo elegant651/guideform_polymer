@@ -1,16 +1,17 @@
 <link rel="import" href="../bower_components/core-collapse/core-collapse.html">
 <link rel="import" href="../bower_components/core-selector/core-selector.html">
 <link rel="import" href="../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
 <link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
 <link rel="import" href="list-card.html">
 <link rel="import" href="list-nav.html">
 
-<polymer-element name="main-card" attributes="groups isDirect route" center-justified horizontal layout>
+<polymer-element name="main-card" attributes="mode wide groups isDirect route" center-justified horizontal layout>
 <template>
 	<style>
 		:host {
-			width: 970px;
-			margin: 0 auto;
+			width: {{pWidth}}px;
+			margin: 0 auto;			
 		}
 
 		button:focus {
@@ -23,7 +24,13 @@
 
 		.resources-panel {
 			width: 100%;
-			margin-top: 60px;
+			margin-top: 50px;
+			margin-bottom: 20px;
+			background: rgba(255,255,255,1);			
+		}
+
+		#ic_expand {	
+			margin-right: 10px;
 		}
 
 		#btn_resources {
@@ -31,11 +38,11 @@
 			height: 60px;
 			color: rgba(102,102,102,1);
 			font-size: 20px;
-
+			
 			background: rgba(255,255,255,1);			
 			border: 1px solid rgba(220,220,220,1);			
 			cursor: pointer;
-			padding-left: 20px;
+			padding-left: 20px;			
 		}		
 
 		#btn_resources:hover {
@@ -49,9 +56,16 @@
 			color: rgba(255,255,255,1);
 		}		
 
+		#collapse {
+			border-left: 1px solid rgba(230,230,230,1);
+			border-right: 1px solid rgba(230,230,230,1);
+			border-bottom: 1px solid rgba(230,230,230,1);
+		}
+
 		.collapse-content {
 			width: 100%;
-			margin-top: 28px;
+			margin-top: 28px;			
+			margin-bottom: 20px;
 		}
 
 		.collapse-content button {
@@ -66,13 +80,21 @@
 			font-size: 15px;
 			color: rgba(120,120,120,1);
 			background: rgba(255,255,255,1);			
-			border: 1px solid rgba(220,220,220,1);
+			border: 1px solid rgba(180,180,180,1);
+			border-radius: 5px;			
 		}		
 
 		.collapse-content button:hover {
-			border-color: rgba(205,205,205,1);
 			color: rgba(110,140,0,1);
+			background: rgba(235,245,215,1);
+			border-color: rgba(205,210,195,1);			
 		}		
+
+		.collapse-content button:active {
+			color: rgba(255,255,255,1);
+			background: rgba(140,185,0,1);
+			border-color: rgba(110,140,0,1);
+		}
 
 		.collapse-content a {
 			text-decoration: none;
@@ -84,18 +106,20 @@
 			right: 0;
 			top: 20px;	
 			width: 100%;								
+			margin-bottom: 40px;
 		}		
 
 		.card {	
 			position: relative;
 			float: left;
 			width: 300px;			
-			height: 430px;			
+			height: 460px;			
 			margin-bottom: 40px;						
 			background: rgb(255,255,255);			
 			text-align: left;
+			text-decoration: none;
 
-			border: 1px solid rgba(220,220,220,1);
+			border: 1px solid rgba(230,230,230,1);
 			border-radius: 5px;
 			box-shadow: 0px 3px 0px 0px rgba(220,220,220,1);
 		}
@@ -103,84 +127,114 @@
 		.card:hover {
 			border-color: rgba(205,205,205,1);
 			box-shadow: 0px 3px 0px 0px rgba(205,205,205,1);
-		}
+		}		
 
 		.card core-image {
 			width:240px; 
 			height:160px; 
-			margin: 0 auto; 
+			
+			margin-left: 30px;
 			margin-top: 34px;
-			margin-bottom: 38px;
+			margin-bottom: 23px;
 		}
 
-		.card .group_title {			
+		.card .group_title {				
 			font-size: 20px;
 			color: rgba(102,102,102,1);
 			margin-left: 30px;
-			margin-bottom: 29px;
+			margin-bottom: 10px;			
+			white-space: normal;
 		}		
 
-		.card .group_title.gi_1 {
-			color: rgba(115,150,0,1);
-		}
+		.card a{			
+			text-decoration: none;
+		}				
 
 		.card list-card {
 			margin-left: 30px;
 		}
 
 	</style>
-	<div class="main-panel" center-justified vertical layout>				
-		<div class="resources-panel" hidden?={{selected?1:0}}>
-			<button id="btn_resources" on-click="{{toggleResources}}" horizontal layout><div>Resources</div> <span flex></span><core-icon id="ic_expand" icon="expand-more"></core-icon></button>
-			<core-collapse id="collapse">
-				<div class="collapse-content" horizontal layout center-justified wrap>
-					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource1</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
-					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource2</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
-					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource3</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
-					<a href="https://elegantuniv.dayatti.com" target="_blank"><button horizontal layout><div>Resource4</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
-				</div>
-			</core-collapse>
-		</div>
+	<app-globals id="globals"></app-globals>
+	<div class="main-panel" center-justified vertical layout>			
+		<template if="{{mode==='teacher'}}">	
+			<div class="resources-panel" hidden?={{selected?1:0}}>
+				<button id="btn_resources" on-click="{{toggleResources}}"><div horizontal layout><div>Sample Resources</div><div flex></div><core-icon id="ic_expand" icon="expand-more"></core-icon></div></button>
+				<core-collapse id="collapse">
+					<div class="collapse-content" horizontal layout center-justified wrap>
+						<a href="" target="_blank"><button horizontal layout><div>Sample File</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+						<a href="" target="_blank"><button horizontal layout><div>Sample File2</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+						<a href="" target="_blank"><button horizontal layout><div>Sample File3</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>
+						<a href="" target="_blank"><button horizontal layout><div>Sample File4</div><span flex></span><core-icon class="ic_down" icon="file-download"></core-icon></button></a>						
+					</div>
+				</core-collapse>
+			</div>
+		</template>
 
 		<core-animated-pages selected="{{selected}}" transitions="hero-transition cross-fade">			
 			<section>
 				<div class="item-list" horizontal justified layout wrap>			
 					<template repeat="{{group, i in groups}}">											
-						<div class="card" hero-id="group-{{i}}" hero cross-fade vertical layout>
-							<core-image sizing="cover" src="../images/{{group.img}}"></core-image>
-							<div class="group_title gi_{{i}}">{{group.title}}</div>		
-							<list-card categories="{{group.categories}}" groupId="{{i}}" on-core-activate="{{onHandler}}"></list-card>					
+						<div class="card" hero-id="group-{{group_sets[i]}}" hero cross-fade vertical layout>
+							<a href="#{{group_sets[i]}}/{{0}}"><core-image sizing="cover" src="../images/dtest.png" groupId="{{group_sets[i]}}" on-tap="{{onGroupTitleTapped}}"></core-image></a>
+							<a href="#{{group_sets[i]}}/{{0}}"><core-item class="group_title gi_{{i}}" groupId="{{group_sets[i]}}" on-tap="{{onGroupTitleTapped}}">{{group.title}}</core-item></a>
+							<list-card mode="{{mode}}" categories="{{group.categories}}" groupId="{{group_sets[i]}}" on-core-activate="{{onHandler}}"></list-card>					
 						</div>						
 					</template>					
 				</div>
 			</section>
 
-			<list-nav on-nav-back="{{changePage}}" group="{{group}}" groupId="{{group_id}}" categoryIdx="{{category_idx}}"></list-nav>
+			<list-nav on-nav-back="{{changePage}}" wide="{{wide}}" group="{{group}}" groupId="{{group_id}}" categoryIdx="{{category_idx}}"></list-nav>
 		</core-animated-pages>
 	</div>
 </template>
 <script>
 	Polymer('main-card', {
-		selected: 0,
+		selected: 0,		
 		group_id: -1,		
 		category_idx: -1,		
 		isDirect: false,
+		group_sets: [],
+		wide: true,
+		pWidth: 970,
+		mode: "teacher",
 
 		created: function() {
 			this.groups = [];
 			this.group = [];
+		},		
+
+		wideChanged: function() {
+			if(this.wide){
+				this.pWidth = 970;
+			} else{
+				this.pWidth = 700;
+			}					
 		},
 		
 		domReady: function(e) {
-			if(this.route){
-		    	this.isDirect = true;			  			    				    	
-	    		var arrRoute = this.route.split("/");					    		
-	    		this.group_id = arrRoute[0];
-	    		this.group = this.groups[this.group_id];					
+			this.initGroup();
+			if(this.route) {
+				this.isDirect = true;
+
+				var arrRoute = this.route.split("/");			    			    		
+	    		this.group_id = parseInt(arrRoute[0]);
+	    		this.group = this.groups[this.group_sets.indexOf(this.group_id)];					
 				this.category_idx = arrRoute[1];
 				this.changePage();
-		    }
-		},	
+			}
+		},		
+
+		initGroup: function() {			
+			//set init groups
+	    	var newgroups = [];
+
+	    	this.group_sets = (this.mode==="teacher") ? this.$.globals.arr_tg : this.$.globals.arr_sg;
+	    	for(var i=0; i<this.group_sets.length; i++) {
+	    		newgroups.push(this.groups[this.group_sets[i]]);
+	    	}
+	    	this.groups = newgroups;	    	
+		},
 		
 		toggleResources: function() {
 			this.$.collapse.toggle();
@@ -193,10 +247,18 @@
 				this.$.ic_expand.setAttribute("icon", "expand-more");
 			}				
 		},
+
+		onGroupTitleTapped: function(event) {
+			this.group_id =	event.target.getAttribute("groupId");			
+			this.group = this.groups[this.group_sets.indexOf(parseInt(this.group_id))];
+
+			this.category_idx = 0;
+			this.changePage();
+		},
 		
 		onHandler: function(event, detail, sender) {
 			this.group_id = detail.item.getAttribute("groupId");
-			this.group = this.groups[this.group_id];			
+			this.group = this.groups[this.group_sets.indexOf(parseInt(this.group_id))];
 
 			this.category_idx = detail.item.getAttribute("category-idx");
 			this.changePage();	

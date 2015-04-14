@@ -2,13 +2,35 @@
 <link rel="import" href="../bower_components/core-menu/core-submenu.html">	
 <link rel="import" href="../bower_components/core-item/core-item.html">
 <link rel="import" href="../bower_components/core-drawer-panel/core-drawer-panel.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
 <link rel="import" href="content-page.html">
 
-<polymer-element name="list-nav" attributes="selectedItem group groupId categoryIdx">
+<polymer-element name="list-nav" attributes="selectedItem wide group groupId categoryIdx">
 <template>
 	<style>
-		:host {
-			width: 300px;			
+		:host {			
+			display: block;
+			width: 300px;
+			height: {{windowHeight}}px;						
+		}
+
+		#navBar core-icon-button {
+			margin-left: 30px;					
+			color: rgba(77,77,77,1);
+		}
+
+		#navBar core-icon-button .title {			
+			margin-left: 10px;
+			font-size: 12px;
+			color: rgba(128,128,128,1);
+		}
+
+		#cibToggle {
+			position: absolute;			
+			top: 0px;
+			left: 240px;
+			height: 100%;
+			line-height: 800px;
 		}
 
 		.nav {
@@ -20,12 +42,17 @@
 			padding-right: 30px;
 		}
 
-		core-drawer-panel {			
-			overflow: inherit;
-			height: 1000px;
+		core-drawer-panel {				
+			position: fixed;		
+			overflow: inherit;			
+			height: 100%;									
+		}						
+
+		[drawer] {						
+			background: #fff;			
 		}
 
-		.group_title {
+		.group_title {			
 			margin-top: 38px;
 			margin-left: 10px;
 			font-size: 22px;
@@ -37,7 +64,7 @@
 		}
 
 		core-item:hover {
-			color: rgba(110,137,0,1);
+			color: rgba(140,185,0,1);
 			font-weight: bold;
 		}
 
@@ -53,18 +80,18 @@
 		.subcate {
 			font-size: 14px;			
 			margin-left: 22px;			
-		}
+		}		
 
 	</style>	
-
-	<core-drawer-panel>
+	<app-globals id="globals"></app-globals>
+	<core-drawer-panel id="drpanel" forceNarrow="{{wide?false:true}}" drawerWidth="300px" narrow="true">
 		<div drawer>			
 			<section layout vertical id="navBar">
-				<div layout vertical>				
-					<core-icon-button icon="home" on-tap="{{back}}"></core-icon-button>		
+				<div horizontal layout>				
+					<core-icon-button icon="arrow-back" on-tap="{{back}}"><span class="title">Table of contents</span></core-icon-button>						
 				</div>				
 				<div class="nav" hero-id="group-{{groupId}}" hero cross-fade>
-					<core-image style="width:240px; height:160px" sizing="cover" src="../images/{{group.img}}"></core-image>
+					<core-image style="width:240px; height:160px" sizing="cover" src="../images/dtest.png"></core-image>
 					<div class="group_title">{{group.title}}</div>
 					<core-menu selected="{{categoryIdx}}" on-core-select="{{selectAction}}">
 						<template repeat="{{cate, i in group.categories}}">
@@ -79,34 +106,63 @@
 						</template>
 					</core-menu>
 				</div>
+				<core-icon-button id="cibToggle" icon="chevron-right" on-click="{{toggleClick}}" core-drawer-toggle hidden></core-icon-button>
 			</section>	
 		</div>
-		<div main>
-			<content-page category="{{item}}" cross-fade></content-page>
+		<div main>			
+			<content-page category="{{item}}" wide="{{wide}}" on-open-menu="{{openMenuHandler}}" cross-fade fullbleed layout></content-page>			
 		</div>
+	</core-drawer-panel>
 </template>
 <script>
 	Polymer({
 		selectedItem: null,
 		item: null,		
+		wide: true,				
+		windowHeight: 700,
+
+		created: function() {
+			this.windowHeight = window.innerHeight;
+			var that = this;
+			window.addEventListener("resize", function(){
+				that.windowHeight = window.innerHeight;
+			});
+		},
 
 		back: function() {			
 			this.fire('nav-back');
+		},				
+
+		toggleClick: function() {			
+			if(this.$.drpanel.selected==="main"){
+				this.$.cibToggle.setAttribute("icon", "chevron-left");
+			} else {
+				this.$.cibToggle.setAttribute("icon", "chevron-right");
+			}			
 		},
 
 		selectAction: function(e, detail) {
 			if(detail.isSelected) {											
-				var cate = this.group.categories[this.categoryIdx];
-				var content = "";
-				if(cate!=undefined && cate.content!=undefined) content = cate.content;
+				this.closeMenu();
 
+				var cate = this.group.categories[this.categoryIdx];
+				var content = (cate && cate.content) ? cate.content : "";								
 				this.item = {
+					groupIdx: parseInt(this.groupId)+1,
 					catetitle: detail.item.getAttribute("catetitle"), 
 					label: detail.item.label, 
-					idx: detail.item.getAttribute("idx"),
+					cateidx: parseInt(detail.item.getAttribute("idx"))+1,
 					content: content
-				};												
+				};											
 			}
+		},
+
+		openMenuHandler: function() {						
+			this.$.drpanel.openDrawer();						
+		},
+
+		closeMenu: function() {			
+			this.$.drpanel.closeDrawer();
 		}
 	});
 </script>

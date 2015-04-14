@@ -1,0 +1,24 @@
+<polymer-element name="app-globals">
+	<script>
+		(function() {				
+			var values = {};
+
+			var arr_tg = [0,1,2,3,4,5]; // teacher group ids
+			var arr_sg = [0,1,4,8]; // student group ids			
+
+			Polymer({
+				ready: function() {					
+					this.arr_tg = arr_tg;
+					this.arr_sg = arr_sg;					
+					
+					this.values = values;	
+					for(var i=0; i<this.attributes.length; i++) {
+						var attr = this.attributes[i];
+						values[attr.nodeName] = attr.value;
+					}
+				}
+			});
+		})();
+
+	</script>
+</polymer-element>
